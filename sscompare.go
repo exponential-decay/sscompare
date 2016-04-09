@@ -28,6 +28,15 @@ func init() {
    flag.StringVar(&hash2, "hash2", "false", "[Conditional] Hash to compare a hash1 to. The haystack.")
 }
 
+func compareHashes(hash1 string, hash2 string) {
+   score, err := ssdeep.Compare(hash1, hash2)
+   if err != nil {
+      fmt.Fprintln(os.Stderr, "ERROR:", err)
+      os.Exit(1)      
+   }
+   fmt.Fprintln(os.Stdout, hash1, ",", hash2, ",", score)
+}
+
 func fileExists(path string) bool {
    var exists bool = false   
    _, err := os.Open(path)
@@ -48,7 +57,7 @@ func hashString(str string) string {
    return hash
 }
 
-func compareStrings(str1 string, str2 string) int {
+func compareStrings(str1 string, str2 string) {
    hash1 := hashString(str1)
    hash2 := hashString(str2)
    score, err := ssdeep.Compare(hash1, hash2)
@@ -56,7 +65,7 @@ func compareStrings(str1 string, str2 string) int {
       fmt.Fprintln(os.Stderr, "ERROR:", err)
       os.Exit(1)
    }
-   return score
+   fmt.Fprintln(os.Stdout, str1, ",", str2, ",", score)
 }
 
 func createFileHash(path string) string {
@@ -85,7 +94,7 @@ func compareFiles(file1 string, file2 string) {
          fmt.Fprintln(os.Stderr, "ERROR:", err)
          os.Exit(1)
       }
-      fmt.Println(score)
+      fmt.Fprintln(os.Stdout, file1, ",", file2, ",", score)
    }
 }
 
@@ -137,7 +146,11 @@ func main() {
    }
    
    if (compare == true && string1 != "false" && string2 != "false") {
-      fmt.Println(compareStrings(string1, string2))
+      compareStrings(string1, string2)
+   }
+
+   if (compare == true && hash1 != "false" && hash2 != "false") {
+      compareHashes(hash1, hash2)
    } 
 }
 
