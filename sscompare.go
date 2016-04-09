@@ -12,7 +12,7 @@ var fuzz, compare, compute bool
 var file1, file2, hash1, hash2, string1, string2, dir1 string
 
 var storeHashes bool = false
-var hashes []string
+var hashes [][]string
 
 
 func init() {
@@ -107,6 +107,36 @@ func compareFiles(file1 string, file2 string) {
    }
 }
 
+func generateComparisonTable(hashes [][]string) {
+   
+   total := 0
+   x := len(hashes)
+   for hash, _ := range hashes {
+      x = x - 1
+      if len(hashes[hash]) > 1 {    //we have (x) block slice, we may have empties
+         hash1 := hashes[hash][0]
+         found := false
+         for h, _ := range hashes {
+            total += 1
+            if len(hashes[h]) > 1 {    //preferable to delete empty slices? 
+               hash2 = hashes[h][0]
+               score, err := ssdeep.Compare(hash1, hash2)
+               if err == nil {
+                  if score == 100 && found == false { //remove first identical (itself)
+                     found = true
+                  } else {
+                     if score != 0 {
+                        fmt.Println(score, hashes[hash][1], hashes[h][1])
+                     }
+                  }
+               }         
+            }
+         }
+      }
+   }
+   fmt.Println(total, len(hashes))
+}
+
 func readFile(path string, fi os.FileInfo, err error) error {
    f1, _ := fileExists(path) 
    if f1 {
@@ -114,7 +144,8 @@ func readFile(path string, fi os.FileInfo, err error) error {
       case mode.IsRegular():
          hash := createFileHash(path)
          if storeHashes == true {
-            hashes = append(hashes, hash)
+            row := []string{hash, path}
+            hashes = append(hashes, row)
          } else {
             fmt.Fprintln(os.Stderr, path, ",", hash)
          }
@@ -127,39 +158,13 @@ func readFile(path string, fi os.FileInfo, err error) error {
    return nil
 }
 
-func generateComparisonTable(hashes []string) {
-   
-   total := 0
-   x := len(hashes)
-   for hash, _ := range hashes {
-      x = x - 1
-      hash1 = hashes[hash]
-      found := false
-      for h, _ := range hashes {
-         total += 1
-         hash2 = hashes[h]
-         score, err := ssdeep.Compare(hash1, hash2)
-         if err == nil {
-            if score == 100 && found == false { //remove first identical (itself)
-               found = true
-            } else {
-               if score != 0 {
-                  fmt.Println(score)
-               }
-            }
-         }         
-      }
-   }
-   fmt.Println(total, len(hashes))
-}
-
 func computeAll(path string) { 
    f1, fi := fileExists(path)
    if f1 {
       mode := fi.Mode()
       if mode.IsDir() {
          storeHashes = true
-         hashes = make([]string, 1000)
+         hashes = make([][]string, 1000)
          filepath.Walk(path, readFile)
       }
       if len(hashes) > 0 {
