@@ -124,7 +124,7 @@ func handleComputeResults(score int, hash1 []string, hash2 []string, all bool) i
       if rescache == false {
          results_cache = make([][]string, 512)
          results_cache = append(results_cache, row)
-         fmt.Fprintln(os.Stdout, hfile1, ",", hfile2, ",", score)
+         fmt.Fprintln(os.Stdout, score, ",", hfile1, ",", hfile2)
          added = 1
          rescache = true
       } else {
