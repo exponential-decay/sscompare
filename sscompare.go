@@ -11,6 +11,10 @@ import (
 var fuzz, compare, compute bool
 var file1, file2, hash1, hash2, string1, string2, dir1 string
 
+var storeHashes bool = false
+var hashes []string
+
+
 func init() {
    flag.BoolVar(&fuzz, "fuzz", false, "Generate a fuzzy hash for a file or string.")
    flag.BoolVar(&compare, "compare", false, "Compare two hashes and return the percentage (%) familiarity.")
@@ -108,7 +112,12 @@ func readFile(path string, fi os.FileInfo, err error) error {
    if f1 {
       switch mode := fi.Mode(); {
       case mode.IsRegular():
-         fmt.Println(createFileHash(path))
+         hash := createFileHash(path)
+         if storeHashes == true {
+            hashes = append(hashes, hash)
+         } else {
+            fmt.Fprintln(os.Stderr, path, ",", hash)
+         }
       case mode.IsDir():
          fmt.Fprintln(os.Stderr, "INFO:", fi.Name(), "is a directory.")      
       default: 
@@ -118,12 +127,43 @@ func readFile(path string, fi os.FileInfo, err error) error {
    return nil
 }
 
+func generateComparisonTable(hashes []string) {
+   
+   total := 0
+   x := len(hashes)
+   for hash, _ := range hashes {
+      x = x - 1
+      hash1 = hashes[hash]
+      found := false
+      for h, _ := range hashes {
+         total += 1
+         hash2 = hashes[h]
+         score, err := ssdeep.Compare(hash1, hash2)
+         if err == nil {
+            if score == 100 && found == false { //remove first identical (itself)
+               found = true
+            } else {
+               if score != 0 {
+                  fmt.Println(score)
+               }
+            }
+         }         
+      }
+   }
+   fmt.Println(total, len(hashes))
+}
+
 func computeAll(path string) { 
    f1, fi := fileExists(path)
    if f1 {
       mode := fi.Mode()
       if mode.IsDir() {
+         storeHashes = true
+         hashes = make([]string, 1000)
          filepath.Walk(path, readFile)
+      }
+      if len(hashes) > 0 {
+         generateComparisonTable(hashes)
       }
    }
 }
