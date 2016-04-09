@@ -13,7 +13,7 @@ var file1, file2, hash1, hash2, string1, string2, dir1 string
 
 var storeHashes bool = false
 var hashes [][]string
-
+var results_cache [][]string
 
 func init() {
    flag.BoolVar(&fuzz, "fuzz", false, "Generate a fuzzy hash for a file or string.")
@@ -107,6 +107,21 @@ func compareFiles(file1 string, file2 string) {
    }
 }
 
+var rescache bool = false
+
+func handleComputeResults(score int, hash1 []string, hash2 []string) {
+   if rescache == false {
+      results_cache = make([][]string, 512)
+      row := []string{hash1[1], hash2[1]}
+      results_cache = append(results_cache, row)
+      fmt.Println(row)
+      rescache = true
+   }
+   //row := []string{hash, path}
+   //hashes = append(hashes, row)
+   //}
+}
+
 func generateComparisonTable(hashes [][]string) {
    
    total := 0
@@ -126,7 +141,7 @@ func generateComparisonTable(hashes [][]string) {
                      found = true
                   } else {
                      if score != 0 {
-                        fmt.Println(score, hashes[hash][1], hashes[h][1])
+                        handleComputeResults(score, hashes[hash], hashes[h])
                      }
                   }
                }         
@@ -150,7 +165,7 @@ func readFile(path string, fi os.FileInfo, err error) error {
             fmt.Fprintln(os.Stderr, path, ",", hash)
          }
       case mode.IsDir():
-         fmt.Fprintln(os.Stderr, "INFO:", fi.Name(), "is a directory.")      
+         //fmt.Fprintln(os.Stderr, "INFO:", fi.Name(), "is a directory.")      
       default: 
          fmt.Fprintln(os.Stderr, "INFO: Something completely different.")
       }
@@ -164,7 +179,7 @@ func computeAll(path string) {
       mode := fi.Mode()
       if mode.IsDir() {
          storeHashes = true
-         hashes = make([][]string, 1000)
+         hashes = make([][]string, 512)
          filepath.Walk(path, readFile)
       }
       if len(hashes) > 0 {
