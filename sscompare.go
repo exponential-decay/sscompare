@@ -4,6 +4,7 @@ import (
 	"os"
 	"fmt"
    "flag"
+   "time"
    "path/filepath"
    "github.com/dutchcoders/gossdeep" 
 )
@@ -14,6 +15,8 @@ var file1, file2, hash1, hash2, string1, string2, dir1 string
 var storeHashes bool = false
 var hashes [][]string
 var results_cache [][]string
+
+var start time.Time
 
 func init() {
    flag.BoolVar(&fuzz, "fuzz", false, "Generate a fuzzy hash for a file or string.")
@@ -109,21 +112,44 @@ func compareFiles(file1 string, file2 string) {
 
 var rescache bool = false
 
-func handleComputeResults(score int, hash1 []string, hash2 []string) {
+func handleComputeResults(score int, hash1 []string, hash2 []string) int {
+   
+   added := 0
+   hfile1 := hash1[1]
+   hfile2 := hash2[1]
+   row := []string{hfile1, hfile2}
    if rescache == false {
       results_cache = make([][]string, 512)
-      row := []string{hash1[1], hash2[1]}
       results_cache = append(results_cache, row)
-      fmt.Println(row)
+      fmt.Fprintln(os.Stdout, hfile1, ",", hfile2, ",", score)
+      added = 1
       rescache = true
+   } else {
+      exist1 := false
+      exist2 := false
+      for idx, _ := range results_cache {
+         if len(results_cache[idx]) != 0 {
+            file1 = results_cache[idx][0]
+            file2 = results_cache[idx][1]
+            if hfile1 == file1 || hfile1 == file2 {
+               exist1 = true
+            }
+            if hfile2 == file1 || hfile2 == file2 {
+               exist2 = true
+               break
+            }
+         }
+      }
+      if exist1 == false || exist2 == false {
+         results_cache = append(results_cache, row)
+         fmt.Fprintln(os.Stdout, score, ",", hfile1, ",", hfile2)
+         added = 1
+      }
    }
-   //row := []string{hash, path}
-   //hashes = append(hashes, row)
-   //}
+   return added
 }
 
-func generateComparisonTable(hashes [][]string) {
-   
+func generateComparisonTable(hashes [][]string) {   
    total := 0
    x := len(hashes)
    for hash, _ := range hashes {
@@ -132,7 +158,6 @@ func generateComparisonTable(hashes [][]string) {
          hash1 := hashes[hash][0]
          found := false
          for h, _ := range hashes {
-            total += 1
             if len(hashes[h]) > 1 {    //preferable to delete empty slices? 
                hash2 = hashes[h][0]
                score, err := ssdeep.Compare(hash1, hash2)
@@ -141,7 +166,7 @@ func generateComparisonTable(hashes [][]string) {
                      found = true
                   } else {
                      if score != 0 {
-                        handleComputeResults(score, hashes[hash], hashes[h])
+                        total += handleComputeResults(score, hashes[hash], hashes[h])
                      }
                   }
                }         
@@ -149,7 +174,8 @@ func generateComparisonTable(hashes [][]string) {
          }
       }
    }
-   fmt.Println(total, len(hashes))
+   elapsed := time.Since(start)
+   fmt.Println(total, elapsed)
 }
 
 func readFile(path string, fi os.FileInfo, err error) error {
@@ -226,6 +252,7 @@ func main() {
    } 
 
    if (compute == true && dir1 != "false") {
+      start = time.Now()
       computeAll(dir1)
    }
 }
