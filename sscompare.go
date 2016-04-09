@@ -8,8 +8,8 @@ import (
    "github.com/dutchcoders/gossdeep" 
 )
 
-var fuzz, compare bool
-var file1, file2, hash1, hash2, string1, string2 string
+var fuzz, compare, compute bool
+var file1, file2, hash1, hash2, string1, string2, dir1 string
 
 func init() {
    flag.BoolVar(&fuzz, "fuzz", false, "Generate a fuzzy hash for a file or string.")
@@ -21,6 +21,7 @@ func init() {
    flag.StringVar(&string2, "string2", "false", "[Conditional] String to compare string1 to.")
    flag.StringVar(&hash1, "hash1", "false", "[Conditional] Hash to run a comparison against. The needle.")
    flag.StringVar(&hash2, "hash2", "false", "[Conditional] Hash to compare a hash1 to. The haystack.")
+   flag.StringVar(&hash2, "dir1", "false", "[Conditional] Directory to run a full 1:1 comparison against.")
 }
 
 func compareHashes(hash1 string, hash2 string) {
