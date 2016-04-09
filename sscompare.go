@@ -230,12 +230,12 @@ func main() {
    flag.Parse()
 
    if flag.NFlag() < 2 {    // can access args w/ len(os.Args[1:]) too
-      fmt.Fprintln(os.Stderr, "Usage:  ssdir [-fuzz] [-file1 ...]")
-      fmt.Fprintln(os.Stderr, "Usage:  ssdir [-fuzz] [-string1 ...]")
-      fmt.Fprintln(os.Stderr, "Usage:  ssdir [-compare] [-file1 ...] [-file2 ...]")
-      fmt.Fprintln(os.Stderr, "Usage:  ssdir [-compare] [-string1 ...] [-string2 ...]")
-      fmt.Fprintln(os.Stderr, "Usage:  ssdir [-compare] [-hash1 ...] [-hash2 ...]")
-      fmt.Fprintln(os.Stderr, "Usage:  ssdir [-compute] [-dir1 ...] [OPTIONAL] [-all]")
+      fmt.Fprintln(os.Stderr, "Usage:  sscompare [-fuzz] [-file1 ...]")
+      fmt.Fprintln(os.Stderr, "Usage:  sscompare [-fuzz] [-string1 ...]")
+      fmt.Fprintln(os.Stderr, "Usage:  sscompare [-compare] [-file1 ...] [-file2 ...]")
+      fmt.Fprintln(os.Stderr, "Usage:  sscompare [-compare] [-string1 ...] [-string2 ...]")
+      fmt.Fprintln(os.Stderr, "Usage:  sscompare [-compare] [-hash1 ...] [-hash2 ...]")
+      fmt.Fprintln(os.Stderr, "Usage:  sscompare [-compute] [-dir1 ...] [OPTIONAL] [-all]")
       fmt.Fprintln(os.Stderr, "Output: [CSV] 'file1','hash'")
       fmt.Fprintln(os.Stderr, "Output: [CSV] 'similarity','file1 | string1 | hash1','file2 | string1 | hash2',")
       flag.Usage()
