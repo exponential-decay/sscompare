@@ -9,7 +9,7 @@ import (
    "github.com/dutchcoders/gossdeep" 
 )
 
-var fuzz, compare, compute bool
+var fuzz, compare, compute, all bool
 var file1, file2, hash1, hash2, string1, string2, dir1 string
 
 var storeHashes bool = false
@@ -29,6 +29,7 @@ func init() {
    flag.StringVar(&hash1, "hash1", "false", "[Conditional] Hash to run a comparison against. The needle.")
    flag.StringVar(&hash2, "hash2", "false", "[Conditional] Hash to compare a hash1 to. The haystack.")
    flag.StringVar(&dir1, "dir1", "false", "[Conditional] Directory to run a full 1:1 comparison against.")
+   flag.BoolVar(&all, "all", false, "[Optional] Output all files, including zero matches and duplicates.")
 }
 
 func compareHashes(hash1 string, hash2 string) {
@@ -112,44 +113,50 @@ func compareFiles(file1 string, file2 string) {
 
 var rescache bool = false
 
-func handleComputeResults(score int, hash1 []string, hash2 []string) int {
+func handleComputeResults(score int, hash1 []string, hash2 []string, all bool) int {
    
    added := 0
    hfile1 := hash1[1]
    hfile2 := hash2[1]
-   row := []string{hfile1, hfile2}
-   if rescache == false {
-      results_cache = make([][]string, 512)
-      results_cache = append(results_cache, row)
-      fmt.Fprintln(os.Stdout, hfile1, ",", hfile2, ",", score)
-      added = 1
-      rescache = true
-   } else {
-      exist1 := false
-      exist2 := false
-      for idx, _ := range results_cache {
-         if len(results_cache[idx]) != 0 {
-            file1 = results_cache[idx][0]
-            file2 = results_cache[idx][1]
-            if hfile1 == file1 || hfile1 == file2 {
-               exist1 = true
-            }
-            if hfile2 == file1 || hfile2 == file2 {
-               exist2 = true
-               break
+
+   if all != true {
+      row := []string{hfile1, hfile2}
+      if rescache == false {
+         results_cache = make([][]string, 512)
+         results_cache = append(results_cache, row)
+         fmt.Fprintln(os.Stdout, hfile1, ",", hfile2, ",", score)
+         added = 1
+         rescache = true
+      } else {
+         exist1 := false
+         exist2 := false
+         for idx, _ := range results_cache {
+            if len(results_cache[idx]) != 0 {
+               file1 = results_cache[idx][0]
+               file2 = results_cache[idx][1]
+               if hfile1 == file1 || hfile1 == file2 {
+                  exist1 = true
+               }
+               if hfile2 == file1 || hfile2 == file2 {
+                  exist2 = true
+                  break
+               }
             }
          }
+         if exist1 == false || exist2 == false {
+            results_cache = append(results_cache, row)
+            fmt.Fprintln(os.Stdout, score, ",", hfile1, ",", hfile2)
+            added = 1
+         }
       }
-      if exist1 == false || exist2 == false {
-         results_cache = append(results_cache, row)
-         fmt.Fprintln(os.Stdout, score, ",", hfile1, ",", hfile2)
-         added = 1
-      }
+   } else {
+      fmt.Fprintln(os.Stdout, score, ",", hfile1, ",", hfile2)
+      added = 1
    }
    return added
 }
 
-func generateComparisonTable(hashes [][]string) {   
+func generateComparisonTable(hashes [][]string, all bool) {   
    total := 0
    x := len(hashes)
    for hash, _ := range hashes {
@@ -165,8 +172,12 @@ func generateComparisonTable(hashes [][]string) {
                   if score == 100 && found == false { //remove first identical (itself)
                      found = true
                   } else {
-                     if score != 0 {
-                        total += handleComputeResults(score, hashes[hash], hashes[h])
+                     if all != true {
+                        if score != 0 {
+                           total += handleComputeResults(score, hashes[hash], hashes[h], all)
+                        } 
+                     } else {
+                        total += handleComputeResults(score, hashes[hash], hashes[h], all)
                      }
                   }
                }         
@@ -199,7 +210,7 @@ func readFile(path string, fi os.FileInfo, err error) error {
    return nil
 }
 
-func computeAll(path string) { 
+func computeAll(path string, all bool) { 
    f1, fi := fileExists(path)
    if f1 {
       mode := fi.Mode()
@@ -209,7 +220,7 @@ func computeAll(path string) {
          filepath.Walk(path, readFile)
       }
       if len(hashes) > 0 {
-         generateComparisonTable(hashes)
+         generateComparisonTable(hashes, all)
       }
    }
 }
@@ -224,9 +235,9 @@ func main() {
       fmt.Fprintln(os.Stderr, "Usage:  ssdir [-compare] [-file1 ...] [-file2 ...]")
       fmt.Fprintln(os.Stderr, "Usage:  ssdir [-compare] [-string1 ...] [-string2 ...]")
       fmt.Fprintln(os.Stderr, "Usage:  ssdir [-compare] [-hash1 ...] [-hash2 ...]")
-      fmt.Fprintln(os.Stderr, "Usage:  ssdir [-compute] [-dir1 ...]")
+      fmt.Fprintln(os.Stderr, "Usage:  ssdir [-compute] [-dir1 ...] [OPTIONAL] [-all]")
       fmt.Fprintln(os.Stderr, "Output: [CSV] 'file1','hash'")
-      fmt.Fprintln(os.Stderr, "Output: [CSV] 'file1 | string1 | hash1','file2 | string1 | hash2','similarity'")
+      fmt.Fprintln(os.Stderr, "Output: [CSV] 'similarity','file1 | string1 | hash1','file2 | string1 | hash2',")
       flag.Usage()
       os.Exit(0)
    }
@@ -253,7 +264,7 @@ func main() {
 
    if (compute == true && dir1 != "false") {
       start = time.Now()
-      computeAll(dir1)
+      computeAll(dir1, all)
    }
 }
 
