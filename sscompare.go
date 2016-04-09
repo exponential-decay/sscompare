@@ -77,7 +77,16 @@ func createFileHash(path string) string {
 }
 
 func compareFiles(file1 string, file2 string) {
-   //feadfile
+   if fileExists(file1) && fileExists(file2) {
+      hash1 := createFileHash(file1)
+      hash2 := createFileHash(file2)
+      score, err := ssdeep.Compare(hash1, hash2)
+      if err != nil {
+         fmt.Fprintln(os.Stderr, "ERROR:", err)
+         os.Exit(1)
+      }
+      fmt.Println(score)
+   }
 }
 
 func handleHash(hash string) {
@@ -123,7 +132,7 @@ func main() {
       fmt.Println(hashString(string1))
    }
 
-   if (compare == true && file1 != "false" && string2 != "false") {
+   if (compare == true && file1 != "false" && file2 != "false") {
       compareFiles(file1, file2)      
    }
    
