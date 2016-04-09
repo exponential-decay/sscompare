@@ -28,14 +28,15 @@ func init() {
    flag.StringVar(&hash2, "hash2", "false", "[Conditional] Hash to compare a hash1 to. The haystack.")
 }
 
-func createFileHash(path string) {
-
-   hash, err := ssdeep.HashFilename(path)   //confusing function title
+func fileExists(path string) bool {
+   var exists bool = false   
+   _, err := os.Open(path)
    if err != nil {
       fmt.Fprintln(os.Stderr, "ERROR:", err)
-      os.Exit(1)
+   } else {
+      exists = true
    }
-   fmt.Println(hash)
+   return exists
 }
 
 func hashString(str string) string {
@@ -58,16 +59,37 @@ func compareStrings(str1 string, str2 string) int {
    return score
 }
 
-func readFile(path string, fi os.FileInfo, err error) error {
+func createFileHash(path string) string {
 
+   var hash string
    f, err := os.Open(path)
    if err != nil {
       fmt.Fprintln(os.Stderr, "ERROR:", err)
    } else {
       f.Close()
+      hash, err = ssdeep.HashFilename(path)   //confusing function title
+      if err != nil {
+         fmt.Fprintln(os.Stderr, "ERROR:", err)
+         os.Exit(1)
+      }
+   }
+   return hash
+}
+
+func compareFiles(file1 string, file2 string) {
+   //feadfile
+}
+
+func handleHash(hash string) {
+   fmt.Println(hash)
+}
+
+func readFile(path string, fi os.FileInfo, err error) error {
+
+   if fileExists(path) {
       switch mode := fi.Mode(); {
       case mode.IsRegular():
-         createFileHash(path)
+         fmt.Println(createFileHash(path))
       case mode.IsDir():
          fmt.Fprintln(os.Stderr, "INFO:", fi.Name(), "is a directory.")      
       default: 
@@ -101,6 +123,10 @@ func main() {
       fmt.Println(hashString(string1))
    }
 
+   if (compare == true && file1 != "false" && string2 != "false") {
+      compareFiles(file1, file2)      
+   }
+   
    if (compare == true && string1 != "false" && string2 != "false") {
       fmt.Println(compareStrings(string1, string2))
    } 
