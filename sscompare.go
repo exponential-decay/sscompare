@@ -1,13 +1,11 @@
-//ssdeep c binding note: https://godoc.org/github.com/dutchcoders/gossdeep#HashFilename
 package main
 
 import (
 	"os"
 	"fmt"
-   "log"
    "flag"
    "path/filepath"
-   "github.com/michielbuddingh/spamsum"
+   "github.com/dutchcoders/gossdeep" 
 )
 
 var fuzz bool
@@ -32,29 +30,36 @@ func init() {
 
 func createFileHash(fp *os.File) {
 
-   if stat, err := fp.Stat(); err != nil {
+/*   if stat, err := fp.Stat(); err != nil {
       log.Fatal(err)   
    }  else {
       hash, err := spamsum.HashReadSeeker(fp, stat.Size())
       if err == nil {
          fmt.Println(hash)
       }
-   }
+   }*/
 }
 
-func hashString(byteval1 []byte) *spamsum.SpamSum {
-   hash := spamsum.HashBytes(byteval1)
+func hashString(str string) string {
+   hash, err := ssdeep.HashString(str)
+   if err != nil {
+      fmt.Fprintln(os.Stderr, "ERROR:", err)
+      os.Exit(1)
+   }
    return hash
 }
 
-func compareStrings(byteval1 []byte, byteval2 []byte) int {
+func compareStrings(byteval1 string, byteval2 string) int {
    hash1 := hashString(byteval1)
    hash2 := hashString(byteval2)
    fmt.Println("byte string 1: ", byteval1)
    fmt.Println("hash1: ", hash1)
    fmt.Println("byte string 2: ", byteval2)   
    fmt.Println("hash2: ", hash2)
-   fmt.Println("comparison result: ", hash1.Compare(*hash2))
+   comparison, err := ssdeep.Compare(hash1, hash2)
+   if err == nil {
+      fmt.Println(comparison)
+   }
    return 1
 }
 
@@ -98,11 +103,11 @@ func main() {
    }
 
    if (fuzz == true && string1 != "false") {
-      fmt.Println(hashString([]byte(string1)))
+      fmt.Println(hashString(string1))
    }
 
    if (compare == true && string1 != "false" && string2 != "false") {
-      compareStrings([]byte(string1), []byte(string2))
+      compareStrings(string1, string2)
    } 
 }
 
