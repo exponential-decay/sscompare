@@ -49,18 +49,15 @@ func hashString(str string) string {
    return hash
 }
 
-func compareStrings(byteval1 string, byteval2 string) int {
-   hash1 := hashString(byteval1)
-   hash2 := hashString(byteval2)
-   fmt.Println("byte string 1: ", byteval1)
-   fmt.Println("hash1: ", hash1)
-   fmt.Println("byte string 2: ", byteval2)   
-   fmt.Println("hash2: ", hash2)
-   comparison, err := ssdeep.Compare(hash1, hash2)
-   if err == nil {
-      fmt.Println(comparison)
+func compareStrings(str1 string, str2 string) int {
+   hash1 := hashString(str1)
+   hash2 := hashString(str2)
+   score, err := ssdeep.Compare(hash1, hash2)
+   if err != nil {
+      fmt.Fprintln(os.Stderr, "ERROR:", err)
+      os.Exit(1)
    }
-   return 1
+   return score
 }
 
 func readFile(path string, fi os.FileInfo, err error) error {
@@ -107,7 +104,7 @@ func main() {
    }
 
    if (compare == true && string1 != "false" && string2 != "false") {
-      compareStrings(string1, string2)
+      fmt.Println(compareStrings(string1, string2))
    } 
 }
 
