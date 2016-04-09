@@ -28,16 +28,14 @@ func init() {
    flag.StringVar(&hash2, "hash2", "false", "[Conditional] Hash to compare a hash1 to. The haystack.")
 }
 
-func createFileHash(fp *os.File) {
+func createFileHash(path string) {
 
-/*   if stat, err := fp.Stat(); err != nil {
-      log.Fatal(err)   
-   }  else {
-      hash, err := spamsum.HashReadSeeker(fp, stat.Size())
-      if err == nil {
-         fmt.Println(hash)
-      }
-   }*/
+   hash, err := ssdeep.HashFilename(path)   //confusing function title
+   if err != nil {
+      fmt.Fprintln(os.Stderr, "ERROR:", err)
+      os.Exit(1)
+   }
+   fmt.Println(hash)
 }
 
 func hashString(str string) string {
@@ -65,16 +63,16 @@ func readFile(path string, fi os.FileInfo, err error) error {
    f, err := os.Open(path)
    if err != nil {
       fmt.Fprintln(os.Stderr, "ERROR:", err)
-      os.Exit(1)  //should only exit if root is null, consider no-exit
-   }
-
-   switch mode := fi.Mode(); {
-   case mode.IsRegular():
-      createFileHash(f)
-   case mode.IsDir():
-      fmt.Fprintln(os.Stderr, "INFO:", fi.Name(), "is a directory.")      
-   default: 
-      fmt.Fprintln(os.Stderr, "INFO: Something completely different.")
+   } else {
+      f.Close()
+      switch mode := fi.Mode(); {
+      case mode.IsRegular():
+         createFileHash(path)
+      case mode.IsDir():
+         fmt.Fprintln(os.Stderr, "INFO:", fi.Name(), "is a directory.")      
+      default: 
+         fmt.Fprintln(os.Stderr, "INFO: Something completely different.")
+      }
    }
    return nil
 }
