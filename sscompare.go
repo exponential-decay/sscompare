@@ -16,17 +16,21 @@ var file1 string
 var file2 string
 var hash1 string
 var hash2 string
+var string1 string
+var string2 string
 
 func init() {
-   flag.BoolVar(&fuzz, "fuzz", true, "Generate a fuzzy hash for a file or string.")
-   flag.BoolVar(&compare, "compare", true, "Compare two hashes and return the percentage (%) familiarity.")
+   flag.BoolVar(&fuzz, "fuzz", false, "Generate a fuzzy hash for a file or string.")
+   flag.BoolVar(&compare, "compare", false, "Compare two hashes and return the percentage (%) familiarity.")
    flag.StringVar(&file1, "file1", "false", "[Conditional] File or string to generate and/or compare a hash for.")
    flag.StringVar(&file2, "file2", "false", "[Conditional] File or string to generate and/or compare a hash for.")
+   flag.StringVar(&string1, "string1", "false", "[Conditional] File or string to generate and/or compare a hash for.")
+   flag.StringVar(&string2, "string2", "false", "[Conditional] File or string to generate and/or compare a hash for.")
    flag.StringVar(&hash1, "hash1", "false", "[Conditional] Hash to run a comparison against. The needle.")
    flag.StringVar(&hash2, "hash2", "false", "[Conditional] Hash to compare a hash1 to. The haystack.")
 }
 
-func createHash(fp *os.File) {
+func createFileHash(fp *os.File) {
 
    if stat, err := fp.Stat(); err != nil {
       log.Fatal(err)   
@@ -36,6 +40,22 @@ func createHash(fp *os.File) {
          fmt.Println(hash)
       }
    }
+}
+
+func hashString(byteval1 []byte) *spamsum.SpamSum {
+   hash := spamsum.HashBytes(byteval1)
+   return hash
+}
+
+func compareStrings(byteval1 []byte, byteval2 []byte) int {
+   hash1 := hashString(byteval1)
+   hash2 := hashString(byteval2)
+   fmt.Println("byte string 1: ", byteval1)
+   fmt.Println("hash1: ", hash1)
+   fmt.Println("byte string 2: ", byteval2)   
+   fmt.Println("hash2: ", hash2)
+   fmt.Println("comparison result: ", hash1.Compare(*hash2))
+   return 1
 }
 
 func readFile(path string, fi os.FileInfo, err error) error {
@@ -48,7 +68,7 @@ func readFile(path string, fi os.FileInfo, err error) error {
 
    switch mode := fi.Mode(); {
    case mode.IsRegular():
-      createHash(f)
+      createFileHash(f)
    case mode.IsDir():
       fmt.Fprintln(os.Stderr, "INFO:", fi.Name(), "is a directory.")      
    default: 
@@ -63,7 +83,9 @@ func main() {
 
    if flag.NFlag() < 2 {    // can access args w/ len(os.Args[1:]) too
       fmt.Fprintln(os.Stderr, "Usage:  ssdir [-fuzz] [-file1 ...]")
-      fmt.Fprintln(os.Stderr, "Usage:  ssdir [-fuzz] [-file1 ...] [-file2 ...]")
+      fmt.Fprintln(os.Stderr, "Usage:  ssdir [-fuzz] [-string1 ...]")
+      fmt.Fprintln(os.Stderr, "Usage:  ssdir [-compare] [-file1 ...] [-file2 ...]")
+      fmt.Fprintln(os.Stderr, "Usage:  ssdir [-compare] [-string1 ...] [-string2 ...]")
       fmt.Fprintln(os.Stderr, "Usage:  ssdir [-compare] [-hash1 ...] [-hash2 ...]")
       fmt.Fprintln(os.Stderr, "Output: [CSV] 'file1','hash'")
       fmt.Fprintln(os.Stderr, "Output: [CSV] 'file1 | hash1','file2 | hash2','similarity'")
@@ -75,5 +97,12 @@ func main() {
       filepath.Walk(file1, readFile)
    }
 
+   if (fuzz == true && string1 != "false") {
+      fmt.Println(hashString([]byte(string1)))
+   }
+
+   if (compare == true && string1 != "false" && string2 != "false") {
+      compareStrings([]byte(string1), []byte(string2))
+   } 
 }
 
