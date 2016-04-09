@@ -8,14 +8,8 @@ import (
    "github.com/dutchcoders/gossdeep" 
 )
 
-var fuzz bool
-var compare bool
-var file1 string
-var file2 string
-var hash1 string
-var hash2 string
-var string1 string
-var string2 string
+var fuzz, compare bool
+var file1, file2, hash1, hash2, string1, string2 string
 
 func init() {
    flag.BoolVar(&fuzz, "fuzz", false, "Generate a fuzzy hash for a file or string.")
