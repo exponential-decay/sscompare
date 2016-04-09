@@ -14,10 +14,11 @@ var file1, file2, hash1, hash2, string1, string2 string
 func init() {
    flag.BoolVar(&fuzz, "fuzz", false, "Generate a fuzzy hash for a file or string.")
    flag.BoolVar(&compare, "compare", false, "Compare two hashes and return the percentage (%) familiarity.")
+   flag.BoolVar(&compare, "compute", false, "Compare all file hashes and output all comparisons for a given directory.")
    flag.StringVar(&file1, "file1", "false", "[Conditional] File or string to generate and/or compare a hash for.")
-   flag.StringVar(&file2, "file2", "false", "[Conditional] File or string to generate and/or compare a hash for.")
+   flag.StringVar(&file2, "file2", "false", "[Conditional] File to compare file1 to.")
    flag.StringVar(&string1, "string1", "false", "[Conditional] File or string to generate and/or compare a hash for.")
-   flag.StringVar(&string2, "string2", "false", "[Conditional] File or string to generate and/or compare a hash for.")
+   flag.StringVar(&string2, "string2", "false", "[Conditional] String to compare string1 to.")
    flag.StringVar(&hash1, "hash1", "false", "[Conditional] Hash to run a comparison against. The needle.")
    flag.StringVar(&hash2, "hash2", "false", "[Conditional] Hash to compare a hash1 to. The haystack.")
 }
@@ -121,8 +122,9 @@ func main() {
       fmt.Fprintln(os.Stderr, "Usage:  ssdir [-compare] [-file1 ...] [-file2 ...]")
       fmt.Fprintln(os.Stderr, "Usage:  ssdir [-compare] [-string1 ...] [-string2 ...]")
       fmt.Fprintln(os.Stderr, "Usage:  ssdir [-compare] [-hash1 ...] [-hash2 ...]")
+      fmt.Fprintln(os.Stderr, "Usage:  ssdir [-compute] [-dir1 ...]")
       fmt.Fprintln(os.Stderr, "Output: [CSV] 'file1','hash'")
-      fmt.Fprintln(os.Stderr, "Output: [CSV] 'file1 | hash1','file2 | hash2','similarity'")
+      fmt.Fprintln(os.Stderr, "Output: [CSV] 'file1 | string1 | hash1','file2 | string1 | hash2','similarity'")
       flag.Usage()
       os.Exit(0)
    }
