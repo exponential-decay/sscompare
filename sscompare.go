@@ -130,7 +130,7 @@ func newVariant(str1 string, str2 string, results_cache [][]string) bool {
          }
       }
    }
-   if exist1 == false || exist2 == false {   
+   if exist1 != true && exist2 != true {   
       add = true  
    }
    return add
@@ -178,16 +178,12 @@ func generateComparisonTable(hashes [][]string, all bool) {
                hash2 = hashes[h][0]
                score, err := ssdeep.Compare(hash1, hash2)
                if err == nil {
-                  if score == 100 && found == false { //remove first identical (itself)
+                  if score == 100 && found == false { //ignore first identical (itself)
                      found = true
                   } else {
-                     if all != true {
-                        if score != 0 {
-                           total += handleComputeResults(score, hashes[hash], hashes[h], all)
-                        } 
-                     } else {
+                     if score != 0 {
                         total += handleComputeResults(score, hashes[hash], hashes[h], all)
-                     }
+                     }  //N.B. can opt to log zeroes, if we really care
                   }
                }         
             }
