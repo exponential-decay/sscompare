@@ -113,6 +113,29 @@ func compareFiles(file1 string, file2 string) {
 
 var rescache bool = false
 
+func newVariant(str1 string, str2 string, results_cache [][]string) bool {
+   add := false   
+   exist1 := false
+   exist2 := false
+   for idx, _ := range results_cache {
+      if len(results_cache[idx]) != 0 {
+         file1 = results_cache[idx][0]
+         file2 = results_cache[idx][1]
+         if str1 == file1 || str2 == file2 {
+            exist1 = true
+         }
+         if str2 == file1 || str2 == file2 {
+            exist2 = true
+            break
+         }
+      }
+   }
+   if exist1 == false || exist2 == false {   
+      add = true  
+   }
+   return add
+}
+
 func handleComputeResults(score int, hash1 []string, hash2 []string, all bool) int {
    
    added := 0
@@ -128,22 +151,8 @@ func handleComputeResults(score int, hash1 []string, hash2 []string, all bool) i
          added = 1
          rescache = true
       } else {
-         exist1 := false
-         exist2 := false
-         for idx, _ := range results_cache {
-            if len(results_cache[idx]) != 0 {
-               file1 = results_cache[idx][0]
-               file2 = results_cache[idx][1]
-               if hfile1 == file1 || hfile1 == file2 {
-                  exist1 = true
-               }
-               if hfile2 == file1 || hfile2 == file2 {
-                  exist2 = true
-                  break
-               }
-            }
-         }
-         if exist1 == false || exist2 == false {
+
+         if newVariant(hfile1, hfile2, results_cache) {
             results_cache = append(results_cache, row)
             fmt.Fprintln(os.Stdout, score, ",", hfile1, ",", hfile2)
             added = 1
@@ -186,7 +195,7 @@ func generateComparisonTable(hashes [][]string, all bool) {
       }
    }
    elapsed := time.Since(start)
-   fmt.Println(total, elapsed)
+   fmt.Fprintln(os.Stderr, total, elapsed)
 }
 
 func readFile(path string, fi os.FileInfo, err error) error {
