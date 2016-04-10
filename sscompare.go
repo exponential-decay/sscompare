@@ -121,7 +121,7 @@ func newVariant(str1 string, str2 string, results_cache [][]string) bool {
       if len(results_cache[idx]) != 0 {
          file1 = results_cache[idx][0]
          file2 = results_cache[idx][1]
-         if str1 == file1 || str2 == file2 {
+         if str1 == file1 || str1 == file2 {
             exist1 = true
          }
          if str2 == file1 || str2 == file2 {
@@ -130,7 +130,7 @@ func newVariant(str1 string, str2 string, results_cache [][]string) bool {
          }
       }
    }
-   if exist1 != true && exist2 != true {   
+   if exist1 != true || exist2 != true {   
       add = true  
    }
    return add
