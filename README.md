@@ -62,6 +62,20 @@ Utilise the output from sscompare in a tool like [SocNetV](http://socnetv.source
   
     ** --score can be used to filter the report to return only values >= to the number (float) given
 
+Usage: 
+
+      usage: graphfuzzy.py [-h] [--csv CSV] [--score SCORE]
+
+      Convert results of a fuzzy hash computation to a network graph, GraphML.
+      Outputs using CSV filename with XML suffix.
+
+      optional arguments:
+        -h, --help            show this help message and exit
+        --csv CSV, --results CSV
+                              CSV export from sscompare tool.
+        --score SCORE         Filter out results less than this match score.
+
+
 ![Network Graph Example](https://raw.githubusercontent.com/ross-spencer/rs-misc-scripts/master/anon-fuzzy-analysis.png)
 
 Share your results with me! And let me know other tools that you've found useful for working with GraphML.
