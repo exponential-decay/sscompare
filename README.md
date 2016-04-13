@@ -58,7 +58,7 @@ Those using graphfuzzy.py (below) require [networkx](https://networkx.github.io/
 
 Utilise the output from sscompare in a tool like [SocNetV](http://socnetv.sourceforge.net/) by creating GraphML
 
-   python graphfuzzy.py --csv fuzzy-report.csv --score 0.5
+    python graphfuzzy.py --csv fuzzy-report.csv --score 0.5
   
    ** --score can be used to filter the report to return only values >= to the number (float) given
 
