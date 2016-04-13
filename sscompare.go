@@ -165,7 +165,8 @@ func handleComputeResults(score int, hash1 []string, hash2 []string, all bool) i
    return added
 }
 
-func generateComparisonTable(hashes [][]string, all bool) {   
+func generateComparisonTable(hashes [][]string, all bool) {
+   fmt.Fprintln(os.Stdout, "score,source,target")   
    total := 0
    x := len(hashes)
    for hash, _ := range hashes {
