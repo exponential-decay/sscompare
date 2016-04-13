@@ -54,7 +54,7 @@ Those using graphfuzzy.py (below) require [networkx](https://networkx.github.io/
 
     pip install networkx
 
-###GraphFuzzy see: 'graph-fuzzy/'
+###GraphFuzzy see: ['graph-fuzzy/'](https://github.com/ross-spencer/sscompare/tree/master/graph-fuzzy)
 
 Utilise the output from sscompare in a tool like [SocNetV](http://socnetv.sourceforge.net/) by creating GraphML
 
