@@ -52,7 +52,7 @@ On Linux, compilation is much easier, but you might need libfyzzy, e.g.
 
 Those using graphfuzzy.py (below) require [networkx](https://networkx.github.io/), I recommend using [PIP](https://pypi.python.org/pypi/pip). 
 
-   pip install networkx
+    pip install networkx
 
 ###GraphFuzzy see: 'graph-fuzzy/'
 
