@@ -41,6 +41,33 @@ Currently uses cgo version of ssdeep: https://godoc.org/github.com/dutchcoders/g
         -string2 string
           	[Conditional] String to compare string1 to.
 
+###Requirements
+
+While this utilizes CGO there are still a handful of complications, including easy compilation on Windows.
+Instructions for Windows have not yet been created. 
+
+On Linux, compilation is much easier, but you might need libfyzzy, e.g. 
+
+    sudo apt-get install libfuzzy2.2.13
+
+Those using graphfuzzy.py (below) require [networkx](https://networkx.github.io/), I recommend using [PIP](https://pypi.python.org/pypi/pip). 
+
+   pip install networkx
+
+###GraphFuzzy see: 'graph-fuzzy/'
+
+Utilise the output from sscompare in a tool like [SocNetV](http://socnetv.sourceforge.net/) by creating GraphML
+
+   python graphfuzzy.py --csv fuzzy-report.csv --score 0.5
+  
+   ** --score can be used to filter the report to return only values >= to the number (float) given
+
+![Network Graph Example](https://raw.githubusercontent.com/ross-spencer/rs-misc-scripts/master/anon-fuzzy-analysis.png)
+
+Share your results with me! And let me know other tools that you've found useful for working with GraphML.
+
+My first two results with SocNetV: [GovDocs and OPF Corpus](https://twitter.com/beet_keeper/status/719512360264683520)
+
 ###License
 
 Copyright (c) 2016 Ross Spencer
