@@ -38,7 +38,7 @@ func compareHashes(hash1 string, hash2 string) {
       fmt.Fprintln(os.Stderr, "ERROR:", err)
       os.Exit(1)      
    }
-   fmt.Fprintln(os.Stdout, hash1, ",", hash2, ",", score)
+   fmt.Fprintln(os.Stdout, score, ",", hash1, ",", hash2)
 }
 
 func fileExists(path string) (bool, os.FileInfo) {
@@ -76,7 +76,7 @@ func compareStrings(str1 string, str2 string) {
       fmt.Fprintln(os.Stderr, "ERROR:", err)
       os.Exit(1)
    }
-   fmt.Fprintln(os.Stdout, str1, ",", str2, ",", score)
+   fmt.Fprintln(os.Stdout, score, ",", str1, ",", str2)
 }
 
 func createFileHash(path string) string {
@@ -107,7 +107,7 @@ func compareFiles(file1 string, file2 string) {
          fmt.Fprintln(os.Stderr, "ERROR:", err)
          os.Exit(1)
       }
-      fmt.Fprintln(os.Stdout, file1, ",", file2, ",", score)
+      fmt.Fprintln(os.Stdout, score, ",", file1, ",", file2)
    }
 }
 
