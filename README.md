@@ -60,7 +60,7 @@ Utilise the output from sscompare in a tool like [SocNetV](http://socnetv.source
 
     python graphfuzzy.py --csv fuzzy-report.csv --score 0.5
   
-   ** --score can be used to filter the report to return only values >= to the number (float) given
+    ** --score can be used to filter the report to return only values >= to the number (float) given
 
 ![Network Graph Example](https://raw.githubusercontent.com/ross-spencer/rs-misc-scripts/master/anon-fuzzy-analysis.png)
 
