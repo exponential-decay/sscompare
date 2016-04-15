@@ -54,6 +54,15 @@ Those using graphfuzzy.py (below) require [networkx](https://networkx.github.io/
 
     pip install networkx
 
+###Golang Future
+
+To convert this tool to a native Golang version is trivial, only two functions need supporting in the Golang implementation of the fuzzy hash library. Writing, and Compare. And both can be dropped into the code here with minimal effort. Likely requiring simple casting of objects based on original Spamsum work. The issue with Spamsum is that it is not yet fit for production, and two bugs have been logged:
+
+[Analysis of short hashes](https://github.com/michielbuddingh/spamsum/issues/2)
+[Analysis vs. reference implementation](https://github.com/michielbuddingh/spamsum/issues/1)
+
+It is my goal to attempt to look at this library as soon as I have a free moment and if there seems a reasonable push to follow up with research. A native implementation would be nice. 
+
 ###GraphFuzzy see: ['graph-fuzzy/'](https://github.com/ross-spencer/sscompare/tree/master/graph-fuzzy)
 
 Utilise the output from sscompare in a tool like [SocNetV](http://socnetv.sourceforge.net/) by creating GraphML
