@@ -49,6 +49,9 @@ Instructions for Windows have not yet been created.
 On Linux, compilation is much easier, but you might need libfyzzy, e.g. 
 
     sudo apt-get install libfuzzy2.2.13
+or: 
+
+    sudo apt-get install libfuzzy-dev
 
 Those using graphfuzzy.py (below) require [networkx](https://networkx.github.io/), I recommend using [PIP](https://pypi.python.org/pypi/pip). 
 
