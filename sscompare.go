@@ -38,7 +38,7 @@ func compareHashes(hash1 string, hash2 string) {
       fmt.Fprintln(os.Stderr, "ERROR:", err)
       os.Exit(1)      
    }
-   fmt.Fprintln(os.Stdout, score, ",", hash1, ",", hash2)
+   fmt.Fprintf(os.Stdout, "%d,%s,%s\n", score, hash1, hash2)
 }
 
 func fileExists(path string) (bool, os.FileInfo) {
@@ -76,7 +76,7 @@ func compareStrings(str1 string, str2 string) {
       fmt.Fprintln(os.Stderr, "ERROR:", err)
       os.Exit(1)
    }
-   fmt.Fprintln(os.Stdout, score, ",", str1, ",", str2)
+   fmt.Fprintf(os.Stdout, "%d,%s,%s\n", score, str1, str2)
 }
 
 func createFileHash(path string) string {
@@ -107,7 +107,7 @@ func compareFiles(file1 string, file2 string) {
          fmt.Fprintln(os.Stderr, "ERROR:", err)
          os.Exit(1)
       }
-      fmt.Fprintln(os.Stdout, score, ",", file1, ",", file2)
+      fmt.Fprintf(os.Stdout, "%d,%s,%s\n", score, file1, file2)
    }
 }
 
@@ -147,19 +147,19 @@ func handleComputeResults(score int, hash1 []string, hash2 []string, all bool) i
       if rescache == false {
          results_cache = make([][]string, 512)
          results_cache = append(results_cache, row)
-         fmt.Fprintln(os.Stdout, score, ",", hfile1, ",", hfile2)
+         fmt.Fprintf(os.Stdout, "%d,%s,%s\n", score, hfile1, hfile2)
          added = 1
          rescache = true
       } else {
 
          if newVariant(hfile1, hfile2, results_cache) {
             results_cache = append(results_cache, row)
-            fmt.Fprintln(os.Stdout, score, ",", hfile1, ",", hfile2)
+            fmt.Fprintf(os.Stdout, "%d,%s,%s\n", score, hfile1, hfile2)
             added = 1
          }
       }
    } else {
-      fmt.Fprintln(os.Stdout, score, ",", hfile1, ",", hfile2)
+      fmt.Fprintf(os.Stdout, "%d,%s,%s\n", score, hfile1, hfile2)
       added = 1
    }
    return added
@@ -205,7 +205,7 @@ func readFile(path string, fi os.FileInfo, err error) error {
             row := []string{hash, path}
             hashes = append(hashes, row)
          } else {
-            fmt.Fprintln(os.Stderr, path, ",", hash)
+            fmt.Fprintf(os.Stderr, "%s,%s\n", path, hash)
          }
       case mode.IsDir():
          //fmt.Fprintln(os.Stderr, "INFO:", fi.Name(), "is a directory.")      
