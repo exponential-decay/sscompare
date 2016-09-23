@@ -52,6 +52,9 @@ func computeAll(path string, all bool) {
          storeHashes = true
          hashes = make([][]string, 512)
          filepath.Walk(path, readFile)
+      default:
+         fmt.Fprintf(os.Stderr, "Warning: Cannot compute all values on a non-directory.\n")
+         os.Exit(1)
       }
    }
    //if we complete processing of dir, generate comparison table
@@ -72,10 +75,6 @@ func readFile(path string, fi os.FileInfo, err error) error {
          } else {
             fmt.Fprintf(os.Stderr, "%s,%s\n", path, hash)
          }
-      case mode.IsDir():
-         //fmt.Fprintln(os.Stderr, "INFO:", fi.Name(), "is a directory.")      
-      default: 
-         //fmt.Fprintln(os.Stderr, "INFO: Something completely different.")
       }
    }
    return nil
