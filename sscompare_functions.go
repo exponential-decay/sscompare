@@ -16,24 +16,6 @@ func compareHashes(hash1 string, hash2 string) {
    fmt.Fprintf(os.Stdout, "%d,%s,%s\n", score, hash1, hash2)
 }
 
-func fileExists(path string) (bool, os.FileInfo) {
-   var fi os.FileInfo
-   var exists bool = false   
-   f, err := os.Open(path)
-   if err != nil {
-      fmt.Fprintln(os.Stderr, "ERROR:", err)
-   } else {
-      defer f.Close()
-      fi, err = f.Stat()
-      if err != nil {
-         fmt.Fprintln(os.Stderr, "ERROR:", err)
-         os.Exit(1)
-      }
-      exists = true
-   }
-   return exists, fi
-}
-
 func hashString(str string) string {
    hash, err := ssdeep.HashString(str)
    if err != nil {

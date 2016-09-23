@@ -29,18 +29,34 @@ func init() {
    flag.BoolVar(&all, "all", false, "[Optional] Output all files, including zero matches and duplicates.")
 }
 
+func fileExists(path string) (bool, os.FileInfo) {
+   f, err := os.Open(path)
+   defer f.Close()
+   if err != nil {
+      fmt.Fprintln(os.Stderr, "Error:", err)
+      os.Exit(1)
+   } 
+   fi, err := f.Stat()
+   if err != nil {
+      fmt.Fprintln(os.Stderr, "Error:", err)
+      os.Exit(1)
+   }
+   return true, fi
+}
+
 func computeAll(path string, all bool) { 
    f1, fi := fileExists(path)
    if f1 {
-      mode := fi.Mode()
-      if mode.IsDir() {
+      switch mode := fi.Mode(); {
+      case mode.IsDir():
          storeHashes = true
          hashes = make([][]string, 512)
          filepath.Walk(path, readFile)
       }
-      if len(hashes) > 0 {
-         generateComparisonTable(hashes, all)
-      }
+   }
+
+   if len(hashes) > 0 {
+      generateComparisonTable(hashes, all)
    }
 }
 
@@ -59,7 +75,7 @@ func readFile(path string, fi os.FileInfo, err error) error {
       case mode.IsDir():
          //fmt.Fprintln(os.Stderr, "INFO:", fi.Name(), "is a directory.")      
       default: 
-         fmt.Fprintln(os.Stderr, "INFO: Something completely different.")
+         //fmt.Fprintln(os.Stderr, "INFO: Something completely different.")
       }
    }
    return nil
