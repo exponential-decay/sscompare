@@ -9,14 +9,14 @@ import (
 )
 
 var (
-   fuzz, compare, compute, all, storeHashes bool
+   fuzzy, compare, compute, all, storeHashes bool
    file1, file2, hash1, hash2, string1, string2, dir string
    results_cache, hashes [][]string
    start time.Time
 )
 
 func init() {
-   flag.BoolVar(&fuzz, "fuzz", false, "Generate a fuzzy hash for a file or string.")
+   flag.BoolVar(&fuzzy, "fuzzy", false, "Generate a fuzzy hash for a file or string.")
    flag.BoolVar(&compare, "compare", false, "Compare two hashes and return the percentage (%) familiarity.")
    flag.BoolVar(&compute, "compute", false, "Compare all file hashes and output all comparisons for a given directory.")
    flag.StringVar(&file1, "file1", "false", "[Conditional] File or string to generate and/or compare a hash for.")
@@ -54,7 +54,7 @@ func computeAll(path string, all bool) {
          filepath.Walk(path, readFile)
       }
    }
-
+   //if we complete processing of dir, generate comparison table
    if len(hashes) > 0 {
       generateComparisonTable(hashes, all)
    }
@@ -86,26 +86,28 @@ func main() {
    flag.Parse()
 
    if flag.NFlag() < 2 {    // can access args w/ len(os.Args[1:]) too
-      fmt.Fprintln(os.Stderr, "Usage:  sscompare [-fuzz] [-file1 ...]")
-      fmt.Fprintln(os.Stderr, "Usage:  sscompare [-fuzz] [-string1 ...]")
+      fmt.Fprintln(os.Stderr, "Usage:  sscompare [-fuzzy] [-file1 ...]")
+      fmt.Fprintln(os.Stderr, "Usage:  sscompare [-fuzzy] [-string1 ...]")
       fmt.Fprintln(os.Stderr, "Usage:  sscompare [-compare] [-file1 ...] [-file2 ...]")
       fmt.Fprintln(os.Stderr, "Usage:  sscompare [-compare] [-string1 ...] [-string2 ...]")
       fmt.Fprintln(os.Stderr, "Usage:  sscompare [-compare] [-hash1 ...] [-hash2 ...]")
       fmt.Fprintln(os.Stderr, "Usage:  sscompare [-compute] [-dir ...] [OPTIONAL] [-all]")
       fmt.Fprintln(os.Stderr, "Output: [CSV] 'file1','hash'")
-      fmt.Fprintln(os.Stderr, "Output: [CSV] 'similarity','file1 | string1 | hash1','file2 | string1 | hash2',")
+      fmt.Fprintln(os.Stderr, "Output: [CSV] 'similarity','filepath one','filepath2'")
       flag.Usage()
       os.Exit(0)
    }
    
-   if (fuzz == true && file1 != "false") {
+   //create fuzzy hashes for a file or a string
+   if (fuzzy == true && file1 != "false") {
       filepath.Walk(file1, readFile)
    }
 
-   if (fuzz == true && string1 != "false") {
+   if (fuzzy == true && string1 != "false") {
       fmt.Println(hashString(string1))
    }
 
+   //compare fuzzy hashes for a file or a string
    if (compare == true && file1 != "false" && file2 != "false") {
       compareFiles(file1, file2)      
    }
@@ -114,10 +116,12 @@ func main() {
       compareStrings(string1, string2)
    }
 
+   //compare two hashes and output similarity
    if (compare == true && hash1 != "false" && hash2 != "false") {
       compareHashes(hash1, hash2)
    } 
 
+   //compute all values (n*n) for a dir
    if (compute == true && dir != "false") {
       start = time.Now()
       computeAll(dir, all)
