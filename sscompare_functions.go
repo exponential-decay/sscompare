@@ -4,71 +4,101 @@ import (
    "os"
    "fmt"
    "time"
-   "github.com/dutchcoders/gossdeep" 
+   "github.com/dutchcoders/gossdeep"
 )
 
-func compareHashes(hash1 string, hash2 string) {
-   score, err := ssdeep.Compare(hash1, hash2)
-   if err != nil {
-      fmt.Fprintln(os.Stderr, "ERROR:", err)
-      os.Exit(1)      
-   }
-   fmt.Fprintf(os.Stdout, "%d,%s,%s\n", score, hash1, hash2)
+var rescache bool = false
+
+type result struct {
+   paths       bool
+   score       int
+   s1          string   //path or hash
+   s2          string
+   strflag     bool     //standard string compare note equal
+   shaflag     bool     //sha1 comparison not equal
 }
 
-func hashString(str string) string {
+func outputresults(r result) {
+   if !r.paths {
+      fmt.Fprintf(os.Stdout, "%d,%s,%s,%b,%b", r.score, r.s1, r.s2, r.strflag) 
+   } else {
+      fmt.Fprintf(os.Stdout, "%d,%s,%s,%b,%b", r.score, r.s1, r.s2, r.strflag, r.shaflag) 
+   }
+}
+
+func comparehashes(hash1 string, hash2 string) (result, error) {
+   var r result
+   var err error
+   r.s1 = hash1
+   r.s2 = hash2
+   r.score, err = ssdeep.Compare(hash1, hash2)
+   if err != nil {
+      return r, sscomp_err      
+   }
+   return r, nil
+}
+
+func hashString(str string) (string, error) {
    hash, err := ssdeep.HashString(str)
    if err != nil {
-      fmt.Fprintln(os.Stderr, "ERROR:", err)
-      os.Exit(1)
+      return "", err
    }
-   return hash
+   return hash, nil
 }
 
-func compareStrings(str1 string, str2 string) {
-   hash1 := hashString(str1)
-   hash2 := hashString(str2)
-   score, err := ssdeep.Compare(hash1, hash2)
+func compareStrings(str1 string, str2 string) (result, error) {
+   var r result
+   var err error
+   r.s1, err = hashString(str1)
    if err != nil {
-      fmt.Fprintln(os.Stderr, "ERROR:", err)
-      os.Exit(1)
+      return r, err
    }
-   fmt.Fprintf(os.Stdout, "%d,%s,%s\n", score, str1, str2)
+   r.s2, err = hashString(str2)
+   if err != nil {
+      return r, err
+   }
+   r.score, err = ssdeep.Compare(hash1, hash2)
+   if err != nil {
+      return r, err
+   }
+   return r, nil
 }
 
-func createFileHash(path string) string {
-
-   var hash string
+func createFileHash(path string) (string, error) {
    f, err := os.Open(path)
+   defer f.Close()
    if err != nil {
-      fmt.Fprintln(os.Stderr, "ERROR:", err)
-   } else {
-      f.Close()
-      hash, err = ssdeep.HashFilename(path)   //confusing function title
-      if err != nil {
-         fmt.Fprintln(os.Stderr, "ERROR:", err)
-         os.Exit(1)
-      }
+      return "", err
+   } 
+   hash, err := ssdeep.HashFilename(path)   //confusing function title, not mine!
+   if err != nil {
+      return "", nil
    }
-   return hash
+   return hash, nil
 }
 
-func compareFiles(file1 string, file2 string) {
+func compareFiles(file1 string, file2 string) (result, error) {
+   var r result
+   var err error
    f1, _ := fileExists(file1)
    f2, _ := fileExists(file2)
-   if f1 && f2 {
-      hash1 := createFileHash(file1)
-      hash2 := createFileHash(file2)
-      score, err := ssdeep.Compare(hash1, hash2)
-      if err != nil {
-         fmt.Fprintln(os.Stderr, "ERROR:", err)
-         os.Exit(1)
-      }
-      fmt.Fprintf(os.Stdout, "%d,%s,%s\n", score, file1, file2)
+   if !f1 || !f2 {
+      return r, fmt.Errorf("Warning: Cannot find file.\n")
    }
+   r.s1, err = createFileHash(file1)
+   if err != nil {
+      return r, err
+   }
+   r.s2, err = createFileHash(file2)
+   if err != nil {
+      return r, err
+   }
+   r.score, err = ssdeep.Compare(r.s1, r.s2)
+   if err != nil {
+      return r, err
+   }
+   return r, nil 
 }
-
-var rescache bool = false
 
 func newVariant(str1 string, str2 string, results_cache [][]string) bool {
    add := false   

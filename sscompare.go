@@ -68,7 +68,10 @@ func readFile(path string, fi os.FileInfo, err error) error {
    if f1 {
       switch mode := fi.Mode(); {
       case mode.IsRegular():
-         hash := createFileHash(path)
+         hash, err := createFileHash(path)
+         if err != nil {
+            return err
+         }
          if storeHashes == true {
             row := []string{hash, path}
             hashes = append(hashes, row)
@@ -99,7 +102,11 @@ func main() {
    
    //create fuzzy hashes for a file or a string
    if (fuzzy == true && file1 != "false") {
-      filepath.Walk(file1, readFile)
+      err := filepath.Walk(file1, readFile)
+      if err != nil {
+         fmt.Fprintf(os.Stderr, "Error: %s\n", err)
+         os.Exit(1)
+      }
    }
 
    if (fuzzy == true && string1 != "false") {
@@ -117,7 +124,12 @@ func main() {
 
    //compare two hashes and output similarity
    if (compare == true && hash1 != "false" && hash2 != "false") {
-      compareHashes(hash1, hash2)
+      r, err := comparehashes(hash1, hash2)
+      if err != nil {
+         fmt.Fprintf(os.Stderr, "Error: %s\n", err)
+         os.Exit(1)
+      }
+      outputresults(r)
    } 
 
    //compute all values (n*n) for a dir
