@@ -27,6 +27,7 @@ func outputresults(r result) {
    }
 }
 
+//Return the hash of a single string.
 func hashString(str string) (string, error) {
    hash, err := ssdeep.HashString(str)
    if err != nil {
@@ -49,6 +50,7 @@ func createfilehash(path string) (string, error) {
    return hash, nil
 }
 
+//Generates hashes for two strings and compares those values
 func compareStrings(str1 string, str2 string) (result, error) {
    var r result
    var err error
@@ -60,9 +62,9 @@ func compareStrings(str1 string, str2 string) (result, error) {
    if err != nil {
       return r, err
    }
-   r.score, err = ssdeep.Compare(hash1, hash2)
+   r.score, err = ssdeep.Compare(r.s1, r.s2)
    if err != nil {
-      return r, err
+      return r, err_sscomp
    }
    if r.score == 100 {     //100 spotted in the wild for non-identifcal files
       if strings.Compare(r.s1, r.s2) != 0 {

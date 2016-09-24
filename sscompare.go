@@ -108,7 +108,6 @@ func main() {
          os.Exit(1)
       }
    }
-
    if (fuzzy == true && string1 != "false") {
       fmt.Println(hashString(string1))
    }
@@ -122,9 +121,15 @@ func main() {
       }
       outputresults(r)
    }
-   
+
+   //compare two strings and output comparison result
    if (compare == true && string1 != "false" && string2 != "false") {
-      compareStrings(string1, string2)
+      r, err := compareStrings(string1, string2)
+      if err != nil {
+         fmt.Fprintf(os.Stderr, "Error: %s\n", err)
+         os.Exit(1)
+      }
+      outputresults(r)
    }
 
    //compare two hashes and output similarity
