@@ -9,28 +9,29 @@ Currently uses cgo version of ssdeep: https://godoc.org/github.com/dutchcoders/g
 
 ###Usage
 
-      Usage:  sscompare [-fuzz] [-file1 ...]
-      Usage:  sscompare [-fuzz] [-string1 ...]
+      Usage:  sscompare [-fuzzy] [-file1 ...]
+      Usage:  sscompare [-fuzzy] [-string1 ...]
       Usage:  sscompare [-compare] [-file1 ...] [-file2 ...]
       Usage:  sscompare [-compare] [-string1 ...] [-string2 ...]
       Usage:  sscompare [-compare] [-hash1 ...] [-hash2 ...]
-      Usage:  sscompare [-compute] [-dir1 ...] [OPTIONAL] [-all]
+      Usage:  sscompare [-compute] [-dir ...] [OPTIONAL] [-all]
       Output: [CSV] 'file1','hash'
-      Output: [CSV] 'similarity','file1 | string1 | hash1','file2 | string1 | hash2',
-      Usage of sscompare:
+      Output: [CSV] 'score','hash1','hash2','string compare fail'
+      Output: [CSV] 'score','file1','file2','string compare fail','sha1 compare fail'
+      Usage of ./sscompare:
         -all
           	[Optional] Output all files, including zero matches and duplicates.
         -compare
           	Compare two hashes and return the percentage (%) familiarity.
         -compute
           	Compare all file hashes and output all comparisons for a given directory.
-        -dir1 string
+        -dir string
           	[Conditional] Directory to run a full 1:1 comparison against.
         -file1 string
           	[Conditional] File or string to generate and/or compare a hash for.
         -file2 string
           	[Conditional] File to compare file1 to.
-        -fuzz
+        -fuzzy
           	Generate a fuzzy hash for a file or string.
         -hash1 string
           	[Conditional] Hash to run a comparison against. The needle.
