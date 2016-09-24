@@ -68,7 +68,7 @@ func readFile(path string, fi os.FileInfo, err error) error {
    if f1 {
       switch mode := fi.Mode(); {
       case mode.IsRegular():
-         hash, err := createFileHash(path)
+         hash, err := createfilehash(path)
          if err != nil {
             return err
          }
@@ -115,7 +115,12 @@ func main() {
 
    //compare fuzzy hashes for a file or a string
    if (compare == true && file1 != "false" && file2 != "false") {
-      compareFiles(file1, file2)      
+      r, err := comparefiles(file1, file2)
+      if err != nil {
+         fmt.Fprintf(os.Stderr, "Error: %s\n", err)
+         os.Exit(1)
+      }
+      outputresults(r)
    }
    
    if (compare == true && string1 != "false" && string2 != "false") {
