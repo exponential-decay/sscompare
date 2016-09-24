@@ -2,91 +2,77 @@
 
 package main
 
-import (
-   "os"
-   "fmt"
-   "time"
-   "github.com/dutchcoders/gossdeep"
-)
+import "github.com/dutchcoders/gossdeep"
 
-func newVariant(str1 string, str2 string, results_cache [][]string) bool {
-   add := false   
-   exist1 := false
-   exist2 := false
-   for idx, _ := range results_cache {
-      if len(results_cache[idx]) != 0 {
-         file1 = results_cache[idx][0]
-         file2 = results_cache[idx][1]
-         if str1 == file1 || str1 == file2 {
-            exist1 = true
-         }
-         if str2 == file1 || str2 == file2 {
-            exist2 = true
-            break
-         }
-      }
-   }
-   if exist1 != true || exist2 != true {   
-      add = true  
-   }
-   return add
+var rescache []result
+
+type pathhash struct {
+   fuzzy string
+   path  string
 }
 
-func handleComputeResults(score int, hash1 []string, hash2 []string, all bool) int {
-   
-   added := 0
-   hfile1 := hash1[1]
-   hfile2 := hash2[1]
-
-   if all != true {
-      row := []string{hfile1, hfile2}
-      if rescache == false {
-         results_cache = make([][]string, 512)
-         results_cache = append(results_cache, row)
-         fmt.Fprintf(os.Stdout, "%d,%s,%s\n", score, hfile1, hfile2)
-         added = 1
-         rescache = true
-      } else {
-
-         if newVariant(hfile1, hfile2, results_cache) {
-            results_cache = append(results_cache, row)
-            fmt.Fprintf(os.Stdout, "%d,%s,%s\n", score, hfile1, hfile2)
-            added = 1
-         }
-      }
-   } else {
-      fmt.Fprintf(os.Stdout, "%d,%s,%s\n", score, hfile1, hfile2)
-      added = 1
-   }
-   return added
-}
-
-func generateComparisonTable(hashes [][]string, all bool) {
-   fmt.Fprintln(os.Stdout, "score,source,target")   
-   total := 0
-   x := len(hashes)
-   for hash, _ := range hashes {
-      x = x - 1
-      if len(hashes[hash]) > 1 {    //we have (x) block slice, we may have empties
-         hash1 := hashes[hash][0]
-         found := false
-         for h, _ := range hashes {
-            if len(hashes[h]) > 1 {    //preferable to delete empty slices? 
-               hash2 = hashes[h][0]
-               score, err := ssdeep.Compare(hash1, hash2)
-               if err == nil {
-                  if score == 100 && found == false { //ignore first identical (itself)
-                     found = true
-                  } else {
-                     if score != 0 {
-                        total += handleComputeResults(score, hashes[hash], hashes[h], all)
-                     }  //N.B. can opt to log zeroes, if we really care
-                  }
-               }         
+//compare every result to each other...
+func createcomparisontable(hashes []pathhash, all bool) (error) {
+   //header for the CSV generated in compute all function
+   outputpathheader()
+   //compare n*n values and output
+   for _, v1 := range hashes {
+      for _, v2 := range hashes {
+         if v1.path != v2.path {
+            var err error
+            var r result
+            r.paths = true
+            r.s1 = v1.path
+            r.s2 = v2.path
+            r.score, err = ssdeep.Compare(v1.fuzzy, v2.fuzzy)
+            if err != nil {
+               return err
+            }
+            //don't record zeros, n.b. log not recording of zeros
+            if r.score != 0 {
+               collectresults(r)
             }
          }
       }
    }
-   elapsed := time.Since(start)
-   fmt.Fprintln(os.Stderr, total, elapsed)
+   return nil
 }
+
+//is one result struct different from the other
+func different(newr, oldr result) bool {
+   if newr.score == oldr.score {
+      if (newr.s1 == oldr.s1 || newr.s1 == oldr.s2) && 
+         (newr.s2 == oldr.s1 || newr.s2 == oldr.s2) {
+         return false
+      }
+   }
+   return true
+}
+
+//do we have a new result to output?
+func newresult(newr result) bool {
+   if len(rescache) > 0 {
+      for x := range(rescache) {
+         if !different(newr, rescache[x]) {
+            return false
+         }
+      }   
+   } else {
+      rescache = append(rescache, newr)
+   }
+   rescache = append(rescache, newr)
+   return true
+}
+
+//function to allow us to begin outputting results
+func collectresults(r result) {
+   if !all {
+      //n*n comparison, we will filter out results matching themselves
+      if newresult(r) {
+         outputresults(r)
+      }
+   } else {
+      outputresults(r)
+   }
+}
+

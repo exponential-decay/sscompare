@@ -7,8 +7,6 @@ import (
    "github.com/dutchcoders/gossdeep"
 )
 
-var rescache bool = false
-
 type result struct {
    paths       bool
    score       int
@@ -18,11 +16,15 @@ type result struct {
    shaflag     bool     //sha1 comparison not equal
 }
 
+func outputpathheader() {
+   fmt.Fprintf(os.Stdout, "\"FUZZY SCORE\", \"PATH_ONE\", \"PATH TWO\", \"STRCOMP FAIL\", \"SHA1 FAIL\"\n")
+}
+
 func outputresults(r result) {
    if !r.paths {
-      fmt.Fprintf(os.Stdout, "%d,%s,%s,%t\n", r.score, r.s1, r.s2, r.strflag) 
+      fmt.Fprintf(os.Stdout, "\"%d\",\"%s\",\"%s\",\"%t\"\n", r.score, r.s1, r.s2, r.strflag) 
    } else {
-      fmt.Fprintf(os.Stdout, "%d,%s,%s,%t,%t\n", r.score, r.s1, r.s2, r.strflag, r.shaflag) 
+      fmt.Fprintf(os.Stdout, "\"%d\",\"%s\",\"%s\",\"%t\",\"%t\"\n", r.score, r.s1, r.s2, r.strflag, r.shaflag) 
    }
 }
 

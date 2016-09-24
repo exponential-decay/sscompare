@@ -11,7 +11,7 @@ import (
 var (
    fuzzy, compare, compute, all, storeHashes bool
    file1, file2, hash1, hash2, string1, string2, dir string
-   results_cache, hashes [][]string
+   pathhashes []pathhash
    start time.Time
 )
 
@@ -49,8 +49,9 @@ func computeall(path string, all bool) {
    if f1 {
       switch mode := fi.Mode(); {
       case mode.IsDir():
-         storeHashes = true
-         hashes = make([][]string, 512)
+         //store hashes for comparison
+         storeHashes = true         
+         //walk the dir
          filepath.Walk(path, readFile)
       default:
          fmt.Fprintf(os.Stderr, "Warning: Cannot compute all values on a non-directory.\n")
@@ -58,8 +59,8 @@ func computeall(path string, all bool) {
       }
    }
    //if we complete processing of a directory, generate comparison table
-   if len(hashes) > 0 {
-      generateComparisonTable(hashes, all)
+   if len(pathhashes) > 0 {
+      createcomparisontable(pathhashes, all)
    }
 }
 
@@ -73,10 +74,10 @@ func readFile(path string, fi os.FileInfo, err error) error {
             return err
          }
          if storeHashes == true {
-            row := []string{hash, path}
-            hashes = append(hashes, row)
+            pathhashes = append(pathhashes, pathhash{hash, path})
          } else {
-            fmt.Fprintf(os.Stderr, "%s,%s\n", path, hash)
+            //TODO: delete in refactor in a single commit: Not used
+            //fmt.Fprintf(os.Stderr, "%s,%s\n", path, hash)
          }
       }
    }
@@ -95,7 +96,8 @@ func main() {
       fmt.Fprintln(os.Stderr, "Usage:  sscompare [-compare] [-hash1 ...] [-hash2 ...]")
       fmt.Fprintln(os.Stderr, "Usage:  sscompare [-compute] [-dir ...] [OPTIONAL] [-all]")
       fmt.Fprintln(os.Stderr, "Output: [CSV] 'file1','hash'")
-      fmt.Fprintln(os.Stderr, "Output: [CSV] 'similarity','filepath one','filepath2'")
+      fmt.Fprintln(os.Stderr, "Output: [CSV] 'score','hash1','hash2','string compare fail'")
+      fmt.Fprintln(os.Stderr, "Output: [CSV] 'score','file1','file2','string compare fail','sha1 compare fail'")
       flag.Usage()
       os.Exit(0)
    }
@@ -146,6 +148,8 @@ func main() {
    if (compute == true && dir != "false") {
       start = time.Now()
       computeall(dir, all)
+      elapsed := time.Since(start)
+      fmt.Fprintln(os.Stderr, elapsed)
    }
 }
 
