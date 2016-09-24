@@ -111,7 +111,12 @@ func main() {
       }
    }
    if (fuzzy == true && string1 != "false") {
-      fmt.Println(hashString(string1))
+      hash, err := hashString(string1)
+      if err != nil {
+         fmt.Fprintf(os.Stderr, "Error: %s\n", err)
+         os.Exit(1)
+      }
+      fmt.Println(hash)
    }
 
    //compare fuzzy hashes for a file or a string
