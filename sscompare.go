@@ -76,8 +76,8 @@ func readFile(path string, fi os.FileInfo, err error) error {
          if storeHashes == true {
             pathhashes = append(pathhashes, pathhash{hash, path})
          } else {
-            //TODO: delete in refactor in a single commit: Not used
-            //fmt.Fprintf(os.Stderr, "%s,%s\n", path, hash)
+            //output for $sscompare -fuzzy -file1 <filepath.file>
+            fmt.Fprintf(os.Stdout, "%s,%s\n", path, hash)
          }
       }
    }
