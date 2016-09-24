@@ -44,7 +44,7 @@ func fileExists(path string) (bool, os.FileInfo) {
    return true, fi
 }
 
-func computeAll(path string, all bool) { 
+func computeall(path string, all bool) { 
    f1, fi := fileExists(path)
    if f1 {
       switch mode := fi.Mode(); {
@@ -57,7 +57,7 @@ func computeAll(path string, all bool) {
          os.Exit(1)
       }
    }
-   //if we complete processing of dir, generate comparison table
+   //if we complete processing of a directory, generate comparison table
    if len(hashes) > 0 {
       generateComparisonTable(hashes, all)
    }
@@ -145,7 +145,7 @@ func main() {
    //compute all values (n*n) for a dir
    if (compute == true && dir != "false") {
       start = time.Now()
-      computeAll(dir, all)
+      computeall(dir, all)
    }
 }
 
