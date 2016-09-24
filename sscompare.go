@@ -114,7 +114,7 @@ func main() {
 
    //compare fuzzy hashes for a file or a string
    if (compare == true && file1 != "false" && file2 != "false") {
-      r, err := comparefiles(file1, file2)
+      r, err := Comparefiles(file1, file2)
       if err != nil {
          fmt.Fprintf(os.Stderr, "Error: %s\n", err)
          os.Exit(1)
@@ -124,7 +124,7 @@ func main() {
 
    //compare two strings and output comparison result
    if (compare == true && string1 != "false" && string2 != "false") {
-      r, err := compareStrings(string1, string2)
+      r, err := CompareStrings(string1, string2)
       if err != nil {
          fmt.Fprintf(os.Stderr, "Error: %s\n", err)
          os.Exit(1)
@@ -134,7 +134,7 @@ func main() {
 
    //compare two hashes and output similarity
    if (compare == true && hash1 != "false" && hash2 != "false") {
-      r, err := comparehashes(hash1, hash2)
+      r, err := Comparehashes(hash1, hash2)
       if err != nil {
          fmt.Fprintf(os.Stderr, "Error: %s\n", err)
          os.Exit(1)

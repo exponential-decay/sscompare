@@ -27,31 +27,8 @@ func outputresults(r result) {
    }
 }
 
-//Return the hash of a single string.
-func hashString(str string) (string, error) {
-   hash, err := ssdeep.HashString(str)
-   if err != nil {
-      return "", err
-   }
-   return hash, nil
-}
-
-//Creates a fizzy hash for a single file
-func createfilehash(path string) (string, error) {
-   f, err := os.Open(path)
-   defer f.Close()
-   if err != nil {
-      return "", err
-   } 
-   hash, err := ssdeep.HashFilename(path)   //confusing function title, not mine!
-   if err != nil {
-      return "", nil
-   }
-   return hash, nil
-}
-
 //Generates hashes for two strings and compares those values
-func compareStrings(str1 string, str2 string) (result, error) {
+func CompareStrings(str1 string, str2 string) (result, error) {
    var r result
    var err error
    r.s1, err = hashString(str1)
@@ -74,7 +51,8 @@ func compareStrings(str1 string, str2 string) (result, error) {
    return r, nil
 }
 
-func comparefiles(file1 string, file2 string) (result, error) {
+//Generates hashes for two files and compares those values
+func Comparefiles(file1 string, file2 string) (result, error) {
    var r result
    r.paths = true
    var err error
@@ -114,7 +92,8 @@ func comparefiles(file1 string, file2 string) (result, error) {
    return r, nil 
 }
 
-func comparehashes(hash1 string, hash2 string) (result, error) {
+//Runs ssdeep compare for two pre-existing hash strings
+func Comparehashes(hash1 string, hash2 string) (result, error) {
    var r result
    var err error
    r.s1 = hash1
@@ -129,6 +108,30 @@ func comparehashes(hash1 string, hash2 string) (result, error) {
       }
    }
    return r, nil
+}
+
+
+//Return the hash of a single string.
+func hashString(str string) (string, error) {
+   hash, err := ssdeep.HashString(str)
+   if err != nil {
+      return "", err
+   }
+   return hash, nil
+}
+
+//Creates a fizzy hash for a single file
+func createfilehash(path string) (string, error) {
+   f, err := os.Open(path)
+   defer f.Close()
+   if err != nil {
+      return "", err
+   } 
+   hash, err := ssdeep.HashFilename(path)   //confusing function title, not mine!
+   if err != nil {
+      return "", nil
+   }
+   return hash, nil
 }
 
 func newVariant(str1 string, str2 string, results_cache [][]string) bool {
