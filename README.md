@@ -7,7 +7,7 @@ Rationale for the use of Fuzzy Hashing in archives: https://gist.github.com/ross
 
 Currently uses cgo version of ssdeep: https://godoc.org/github.com/dutchcoders/gossdeep
 
-###Usage
+### Usage
 
       Usage:  sscompare [-fuzzy] [-file1 ...]
       Usage:  sscompare [-fuzzy] [-string1 ...]
@@ -42,7 +42,7 @@ Currently uses cgo version of ssdeep: https://godoc.org/github.com/dutchcoders/g
         -string2 string
           	[Conditional] String to compare string1 to.
 
-###Requirements
+### Requirements
 
 While this utilizes CGO there are still a handful of complications, including easy compilation on Windows.
 Instructions for Windows have not yet been created. 
@@ -58,7 +58,7 @@ Those using graphfuzzy.py (below) require [networkx](https://networkx.github.io/
 
     pip install networkx
 
-###Golang Future
+### Golang Future
 
 To convert this tool to a native Golang version is trivial, only two functions need supporting in the Golang implementation of the fuzzy hash library. Writing, and Compare. And both can be dropped into the code here with minimal effort. Likely requiring simple casting of objects based on original Spamsum work. The issue with Spamsum is that it is not yet fit for production, and two bugs have been logged:
 
