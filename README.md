@@ -67,7 +67,7 @@ To convert this tool to a native Golang version is trivial, only two functions n
 
 It is my goal to attempt to look at this library as soon as I have a free moment and if there seems a reasonable push to follow up with research. A native implementation would be nice. 
 
-###GraphFuzzy see: ['graph-fuzzy/'](https://github.com/ross-spencer/sscompare/tree/master/graph-fuzzy)
+### GraphFuzzy see: ['graph-fuzzy/'](https://github.com/ross-spencer/sscompare/tree/master/graph-fuzzy)
 
 Utilise the output from sscompare in a tool like [SocNetV](http://socnetv.sourceforge.net/) by creating GraphML
 
@@ -95,7 +95,7 @@ Share your results with me! And let me know other tools that you've found useful
 
 My first two results with SocNetV: [GovDocs and OPF Corpus](https://twitter.com/beet_keeper/status/719512360264683520)
 
-###License
+### License
 
 Copyright (c) 2016 Ross Spencer
 
